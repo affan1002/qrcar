@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚗 Car Contact QR - My First App</title>
+    <style>
+        /* This makes your app look good */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #4299e1;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .step {
+            display: none;
+        }
+        
+        .step.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        input:focus, textarea:focus {
+            border-color: #4299e1;
+            outline: none;
+        }
+        
+        button {
+            background: #4299e1;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        button:hover {
+            background: #3182ce;
+        }
+        
+        .back-btn {
+            background: #718096;
+        }
+        
+        .success {
+            background: #48bb78;
+        }
+        
+        .car-info {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .otp-inputs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .otp-input {
+            width: 50px !important;
+            height: 50px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .contact-info {
+            background: #e6fffa;
+            border: 2px solid #48bb78;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 Car Contact QR</h1>
+            <p>Secure Car Contact Solution</p>
+        </div>
+        
+        <div class="content">
+            <!-- Step 1: Car Selection -->
+            <div id="step1" class="step active">
+                <h2>🚙 Car Details</h2>
+                <div class="car-info">
+                    <strong>Plate Number:</strong> KA01AB1234<br>
+                    <strong>Vehicle Type:</strong> SUV<br>
+                    <strong>Status:</strong> <span style="color: green;">✅ Active</span>
+                </div>
+                <p>Someone wants to contact the owner of this vehicle. Please verify your details to proceed.</p>
+                <button onclick="nextStep()">Contact Owner</button>
+            </div>
+            
+            <!-- Step 2: Contact Form -->
+            <div id="step2" class="step">
+                <h2>📝 Your Details</h2>
+                <p>Please provide your information to contact the car owner:</p>
+                
+                <input type="text" id="userName" placeholder="Your Full Name" required>
+                <input type="tel" id="userPhone" placeholder="Your Phone (+91...)" required>
+                <textarea id="reason" placeholder="Why do you want to contact? (Optional)" rows="3"></textarea>
+                
+                <button onclick="sendOTP()">Send Verification Code</button>
+                <button class="back-btn" onclick="prevStep()">← Back</button>
+            </div>
+            
+            <!-- Step 3: OTP Verification -->
+            <div id="step3" class="step">
+                <h2>🔐 Verify Your Phone</h2>
+                <p>Enter the 6-digit code sent to your phone:</p>
+                <p><strong id="sentToPhone"></strong></p>
+                
+                <div class="otp-inputs">
+                    <input type="text" class="otp-input" maxlength="1" onkeyup="moveToNext(this, 0)">
+                    <input type="text" class="otp-input" maxlength="1" onkeyup="moveToNext(this, 1)">
+                    <input type="text" class="otp-input" maxlength="1" onkeyup="moveToNext(this, 2)">
+                    <input type="text" class="otp-input" maxlength="1" onkeyup="moveToNext(this, 3)">
+                    <input type="text" class="otp-input" maxlength="1" onkeyup="moveToNext(this, 4)">
+                    <input type="text" class="otp-input" maxlength="1" onkeyup="moveToNext(this, 5)">
+                </div>
+                
+                <button class="success" onclick="verifyOTP()">Verify & Get Contact</button>
+                <button class="back-btn" onclick="prevStep()">← Back</button>
+                <p style="text-align: center; font-size: 14px; color: #666;">
+                    Didn't receive? <a href="#" onclick="resendOTP()">Resend Code</a>
+                </p>
+            </div>
+            
+            <!-- Step 4: Success -->
+            <div id="step4" class="step">
+                <h2>🎉 Contact Information</h2>
+                <p>Verification successful! Here are the owner's details:</p>
+                
+                <div class="contact-info">
+                    <h3>👤 Owner: Rahul </h3>
+                    <h3>📞 Phone: +91 98765 43210</h3>
+                </div>
+                
+                <button onclick="callOwner()" style="background: #48bb78;">📞 Call Now</button>
+                <button onclick="messageOwner()" style="background: #38b2ac;">💬 Send WhatsApp</button>
+                <button onclick="startOver()" class="back-btn">🔄 Scan Another Car</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // This makes your app interactive
+        let currentStep = 1;
+        let generatedOTP = '';
+        
+        // Move to next step
+        function nextStep() {
+            if (currentStep < 4) {
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                currentStep++;
+                document.getElementById(`step${currentStep}`).classList.add('active');
+            }
+        }
+        
+        // Move to previous step
+        function prevStep() {
+            if (currentStep > 1) {
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                currentStep--;
+                document.getElementById(`step${currentStep}`).classList.add('active');
+            }
+        }
+        
+        // Send OTP (simulated)
+        function sendOTP() {
+            const userName = document.getElementById('userName').value;
+            const userPhone = document.getElementById('userPhone').value;
+            
+            // Check if fields are filled
+            if (!userName || !userPhone) {
+                alert('Please fill in your name and phone number!');
+                return;
+            }
+            
+            // Check phone format
+            if (!userPhone.startsWith('+91') || userPhone.length < 13) {
+                alert('Please enter a valid Indian phone number (+91...)');
+                return;
+            }
+            
+            // Generate random OTP
+            generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+            
+            // Show phone number
+            document.getElementById('sentToPhone').textContent = userPhone;
+            
+            // In real app, SMS would be sent here
+            alert(`Demo: Your OTP is ${generatedOTP}\n(In real app, this would be sent via SMS)`);
+            console.log('Generated OTP:', generatedOTP);
+            
+            nextStep();
+        }
+        
+        // Verify OTP
+        function verifyOTP() {
+            const otpInputs = document.querySelectorAll('.otp-input');
+            let enteredOTP = '';
+            
+            otpInputs.forEach(input => {
+                enteredOTP += input.value;
+            });
+            
+            if (enteredOTP.length !== 6) {
+                alert('Please enter complete 6-digit OTP');
+                return;
+            }
+            
+            if (enteredOTP === generatedOTP) {
+                alert('✅ Verification Successful!');
+                nextStep();
+            } else {
+                alert('❌ Wrong OTP. Please try again.');
+                // Clear OTP inputs
+                otpInputs.forEach(input => input.value = '');
+                otpInputs[0].focus();
+            }
+        }
+        
+        // Resend OTP
+        function resendOTP() {
+            sendOTP();
+        }
+        
+        // Auto-move between OTP inputs
+        function moveToNext(currentInput, index) {
+            if (currentInput.value.length === 1 && index < 5) {
+                const otpInputs = document.querySelectorAll('.otp-input');
+                otpInputs[index + 1].focus();
+            }
+        }
+        
+        // Call owner
+        function callOwner() {
+            const phone = '+919876543210';
+            window.open(`tel:${phone}`);
+        }
+        
+        // Message owner via WhatsApp
+        function messageOwner() {
+            const phone = '919876543210';
+            const userName = document.getElementById('userName').value;
+            const message = `Hi! I found your car (KA01AB1234) and need to contact you. This is ${userName}.`;
+            
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`);
+        }
+        
+        // Start over
+        function startOver() {
+            // Reset to step 1
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            currentStep = 1;
+            document.getElementById('step1').classList.add('active');
+            
+            // Clear all inputs
+            document.getElementById('userName').value = '';
+            document.getElementById('userPhone').value = '';
+            document.getElementById('reason').value = '';
+            
+            const otpInputs = document.querySelectorAll('.otp-input');
+            otpInputs.forEach(input => input.value = '');
+            
+            generatedOTP = '';
+        }
+        
+        // Auto-focus on first input when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚗 Car Contact QR App Loaded Successfully!');
+            console.log('Made by: Your Name (Cybersecurity Student)');
+        });
+    </script>
+</body>
+</html>
