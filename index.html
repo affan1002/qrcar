@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚗 Car Contact QR - My First App</title>
+    <title>🚗 Car Contact QR - Real App</title>
     <style>
-        /* This makes your app look good */
         body {
             font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -13,42 +13,72 @@
             padding: 20px;
             min-height: 100vh;
         }
-        
+
         .container {
             max-width: 400px;
             margin: 0 auto;
             background: white;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             overflow: hidden;
         }
-        
+
         .header {
             background: #4299e1;
             color: white;
             padding: 20px;
             text-align: center;
         }
-        
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 8px;
+            font-size: 14px;
+            margin: 0;
+        }
+
         .content {
             padding: 30px;
         }
-        
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
         .step {
             display: none;
         }
-        
+
         .step.active {
             display: block;
             animation: fadeIn 0.5s;
         }
-        
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
-        input, textarea {
+
+        input,
+        textarea {
             width: 100%;
             padding: 15px;
             margin: 10px 0;
@@ -57,12 +87,13 @@
             font-size: 16px;
             box-sizing: border-box;
         }
-        
-        input:focus, textarea:focus {
+
+        input:focus,
+        textarea:focus {
             border-color: #4299e1;
             outline: none;
         }
-        
+
         button {
             background: #4299e1;
             color: white;
@@ -73,34 +104,40 @@
             cursor: pointer;
             width: 100%;
             margin: 10px 0;
+            position: relative;
         }
-        
+
         button:hover {
             background: #3182ce;
         }
-        
+
+        button:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+        }
+
         .back-btn {
             background: #718096;
         }
-        
+
         .success {
             background: #48bb78;
         }
-        
+
         .car-info {
             background: #f7fafc;
             padding: 15px;
             border-radius: 8px;
             margin: 10px 0;
         }
-        
+
         .otp-inputs {
             display: flex;
             gap: 10px;
             justify-content: center;
             margin: 20px 0;
         }
-        
+
         .otp-input {
             width: 50px !important;
             height: 50px;
@@ -108,7 +145,7 @@
             font-size: 20px;
             font-weight: bold;
         }
-        
+
         .contact-info {
             background: #e6fffa;
             border: 2px solid #48bb78;
@@ -116,213 +153,636 @@
             border-radius: 8px;
             text-align: center;
         }
-        
-        .hidden {
-            display: none;
+
+        .error-message {
+            background: #fed7d7;
+            border: 1px solid #fc8181;
+            color: #c53030;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            animation: fadeIn 0.3s;
+        }
+
+        .success-message {
+            background: #c6f6d5;
+            border: 1px solid #68d391;
+            color: #2d7d32;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            animation: fadeIn 0.3s;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, .3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .qr-section {
+            background: #f0f7ff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .qr-code {
+            max-width: 200px;
+            margin: 15px auto;
+            display: block;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #e2e8f0;
+        }
+
+        .stat-card h3 {
+            margin: 0;
+            color: #4299e1;
+            font-size: 24px;
+        }
+
+        .stat-card p {
+            margin: 5px 0 0 0;
+            color: #718096;
+            font-size: 14px;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
             <h1>🚗 Car Contact QR</h1>
-            <p>Secure Car Contact Solution</p>
+            <p>Real Backend Integration</p>
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="showOwnerView()">Car Owner</button>
+                <button class="nav-btn" onclick="showScannerView()">Scanner</button>
+            </div>
         </div>
-        
+
         <div class="content">
-            <!-- Step 1: Car Selection -->
-            <div id="step1" class="step active">
-                <h2>🚙 Car Details</h2>
-                <div class="car-info">
-                    <strong>Plate Number:</strong> KA01AB1234<br>
-                    <strong>Vehicle Type:</strong> SUV<br>
-                    <strong>Status:</strong> <span style="color: green;">✅ Active</span>
+            <!-- Owner Dashboard View -->
+            <div id="owner-view" class="view active">
+                <h2>Register Your Car</h2>
+                <div>
+                    <input type="text" id="ownerName" placeholder="Your Full Name" required>
+                    <input type="tel" id="ownerPhone" placeholder="Your Phone (+91...)" required>
+                    <input type="text" id="carPlate" placeholder="Car Plate (KA01AB1234)" required>
+                    <button onclick="registerCar()" id="registerBtn">Generate QR Code</button>
                 </div>
-                <p>Someone wants to contact the owner of this vehicle. Please verify your details to proceed.</p>
-                <button onclick="nextStep()">Contact Owner</button>
-            </div>
-            
-            <!-- Step 2: Contact Form -->
-            <div id="step2" class="step">
-                <h2>📝 Your Details</h2>
-                <p>Please provide your information to contact the car owner:</p>
-                
-                <input type="text" id="userName" placeholder="Your Full Name" required>
-                <input type="tel" id="userPhone" placeholder="Your Phone (+91...)" required>
-                <textarea id="reason" placeholder="Why do you want to contact? (Optional)" rows="3"></textarea>
-                
-                <button onclick="sendOTP()">Send Verification Code</button>
-                <button class="back-btn" onclick="prevStep()">← Back</button>
-            </div>
-            
-            <!-- Step 3: OTP Verification -->
-            <div id="step3" class="step">
-                <h2>🔐 Verify Your Phone</h2>
-                <p>Enter the 6-digit code sent to your phone:</p>
-                <p><strong id="sentToPhone"></strong></p>
-                
-                <div class="otp-inputs">
-                    <input type="text" class="otp-input" maxlength="1" onkeyup="moveToNext(this, 0)">
-                    <input type="text" class="otp-input" maxlength="1" onkeyup="moveToNext(this, 1)">
-                    <input type="text" class="otp-input" maxlength="1" onkeyup="moveToNext(this, 2)">
-                    <input type="text" class="otp-input" maxlength="1" onkeyup="moveToNext(this, 3)">
-                    <input type="text" class="otp-input" maxlength="1" onkeyup="moveToNext(this, 4)">
-                    <input type="text" class="otp-input" maxlength="1" onkeyup="moveToNext(this, 5)">
+
+                <div id="qr-result" style="display: none;" class="qr-section">
+                    <h3>Your QR Code</h3>
+                    <img id="qr-image" class="qr-code" alt="QR Code">
+                    <p>Place this QR code on your car windshield</p>
+                    <button onclick="downloadQR()">Download QR</button>
+                    <button onclick="testScan()" class="success">Test Scanner</button>
                 </div>
-                
-                <button class="success" onclick="verifyOTP()">Verify & Get Contact</button>
-                <button class="back-btn" onclick="prevStep()">← Back</button>
-                <p style="text-align: center; font-size: 14px; color: #666;">
-                    Didn't receive? <a href="#" onclick="resendOTP()">Resend Code</a>
-                </p>
-            </div>
-            
-            <!-- Step 4: Success -->
-            <div id="step4" class="step">
-                <h2>🎉 Contact Information</h2>
-                <p>Verification successful! Here are the owner's details:</p>
-                
-                <div class="contact-info">
-                    <h3>👤 Owner: Rahul </h3>
-                    <h3>📞 Phone: +91 98765 43210</h3>
+
+                <!-- Scan History Section -->
+                <div id="scan-history" class="view-section">
+                    <h2>📊 Who Viewed My Contact</h2>
+
+                    <!-- Stats Summary -->
+                    <div id="stats-summary" style="display: none;">
+                        <div style="display: flex; gap: 10px; margin: 20px 0;">
+                            <div class="stat-card">
+                                <h3 id="total-scans">0</h3>
+                                <p>Total Views</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3 id="today-scans">0</h3>
+                                <p>Today</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3 id="verified-scans">0</h3>
+                                <p>Verified</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Search Button -->
+                    <div>
+                        <input type="tel" id="lookupPhone" placeholder="Your Phone (+91...)" value=""
+                            style="margin: 10px 0;">
+                        <button onclick="loadScanHistory()" style="background: #9f7aea;">
+                            🔍 View Scan History
+                        </button>
+                    </div>
+
+                    <!-- Scan List -->
+                    <div id="scan-list" style="margin-top: 20px;"></div>
                 </div>
-                
-                <button onclick="callOwner()" style="background: #48bb78;">📞 Call Now</button>
-                <button onclick="messageOwner()" style="background: #38b2ac;">💬 Send WhatsApp</button>
-                <button onclick="startOver()" class="back-btn">🔄 Scan Another Car</button>
+            </div>
+
+            <!-- Scanner View -->
+            <div id="scanner-view" class="view">
+                <!-- Step 1: Car Info -->
+                <div id="scan-step-1" class="step active">
+                    <h2>🚙 Car Details</h2>
+                    <div class="car-info" id="car-details">
+                        <div id="car-loading" style="text-align: center;">
+                            <div class="loading"></div>
+                            <p>Loading car details...</p>
+                        </div>
+                    </div>
+                    <button onclick="nextScanStep()" id="contact-btn" style="display: none;">Contact Owner</button>
+                </div>
+
+                <!-- Step 2: Contact Form -->
+                <div id="scan-step-2" class="step">
+                    <h2>📝 Your Details</h2>
+                    <p>Please provide your information to contact the car owner:</p>
+
+                    <input type="text" id="scannerName" placeholder="Your Full Name" required>
+                    <input type="tel" id="scannerPhone" placeholder="Your Phone (+91...)" required>
+                    <textarea id="contactReason" placeholder="Why do you want to contact? (Optional)"
+                        rows="3"></textarea>
+
+                    <button onclick="sendRealOTP()" id="otp-btn">Send Verification Code</button>
+                    <button class="back-btn" onclick="prevScanStep()">← Back</button>
+                </div>
+
+                <!-- Step 3: OTP Verification -->
+                <div id="scan-step-3" class="step">
+                    <h2>🔐 Verify Your Phone</h2>
+                    <p>Enter the 6-digit code sent to your phone:</p>
+                    <p><strong id="otp-phone"></strong></p>
+
+                    <div class="otp-inputs">
+                        <input type="text" class="otp-input" maxlength="1" onkeyup="moveToNext(this, 0)">
+                        <input type="text" class="otp-input" maxlength="1" onkeyup="moveToNext(this, 1)">
+                        <input type="text" class="otp-input" maxlength="1" onkeyup="moveToNext(this, 2)">
+                        <input type="text" class="otp-input" maxlength="1" onkeyup="moveToNext(this, 3)">
+                        <input type="text" class="otp-input" maxlength="1" onkeyup="moveToNext(this, 4)">
+                        <input type="text" class="otp-input" maxlength="1" onkeyup="moveToNext(this, 5)">
+                    </div>
+
+                    <button class="success" onclick="verifyRealOTP()" id="verify-btn">Verify & Get Contact</button>
+                    <button class="back-btn" onclick="prevScanStep()">← Back</button>
+                    <p style="text-align: center; font-size: 14px; color: #666;">
+                        Didn't receive? <a href="#" onclick="resendRealOTP()">Resend Code</a>
+                    </p>
+                </div>
+
+                <!-- Step 4: Success -->
+                <div id="scan-step-4" class="step">
+                    <h2>🎉 Contact Information</h2>
+                    <p>Verification successful! Here are the owner's details:</p>
+
+                    <div class="contact-info">
+                        <h3>👤 Owner: <span id="final-owner-name">Loading...</span></h3>
+                        <h3>📞 Phone: <span id="final-owner-phone">Loading...</span></h3>
+                    </div>
+
+                    <button onclick="callOwner()" style="background: #48bb78;">📞 Call Now</button>
+                    <button onclick="messageOwner()" style="background: #38b2ac;">💬 Send WhatsApp</button>
+                    <button onclick="startOver()" class="back-btn">🔄 Scan Another Car</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // This makes your app interactive
-        let currentStep = 1;
-        let generatedOTP = '';
-        
-        // Move to next step
-        function nextStep() {
-            if (currentStep < 4) {
-                document.getElementById(`step${currentStep}`).classList.remove('active');
-                currentStep++;
-                document.getElementById(`step${currentStep}`).classList.add('active');
+        // Configuration
+        const API_BASE_URL = '/api';
+        // Global variables
+        let currentScanStep = 1;
+        let currentCarId = null;
+        let currentSessionId = null;
+        let generatedQRData = null;
+
+        // Utility Functions
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+
+            const activeView = document.querySelector('.view.active');
+            activeView.insertBefore(errorDiv, activeView.firstChild);
+
+            setTimeout(() => errorDiv.remove(), 5000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.textContent = message;
+
+            const activeView = document.querySelector('.view.active');
+            activeView.insertBefore(successDiv, activeView.firstChild);
+
+            setTimeout(() => successDiv.remove(), 3000);
+        }
+
+        function showLoading(button, originalText) {
+            button.disabled = true;
+            button.innerHTML = `<span class="loading"></span> ${originalText}`;
+        }
+
+        function hideLoading(button, originalText) {
+            button.disabled = false;
+            button.innerHTML = originalText;
+        }
+
+        // API Call Function
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            try {
+                const fullUrl = `${API_BASE_URL}${endpoint}`;
+                console.log(`Making ${method} request to:`, fullUrl);
+
+                const config = {
+                    method,
+                    headers: { 'Content-Type': 'application/json' }
+                };
+
+                if (data) {
+                    config.body = JSON.stringify(data);
+                    console.log('Request data:', data);
+                }
+
+                const response = await fetch(fullUrl, config);
+                console.log('Response status:', response.status);
+
+                const responseText = await response.text();
+                console.log('Raw response:', responseText);
+
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('JSON parse error:', parseError);
+                    throw new Error('Server returned invalid JSON response');
+                }
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'API request failed');
+                }
+
+                return result;
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
             }
         }
-        
-        // Move to previous step
-        function prevStep() {
-            if (currentStep > 1) {
-                document.getElementById(`step${currentStep}`).classList.remove('active');
-                currentStep--;
-                document.getElementById(`step${currentStep}`).classList.add('active');
+
+        // View Navigation
+        function showOwnerView() {
+            document.getElementById('owner-view').classList.add('active');
+            document.getElementById('scanner-view').classList.remove('active');
+        }
+
+        function showScannerView() {
+            document.getElementById('owner-view').classList.remove('active');
+            document.getElementById('scanner-view').classList.add('active');
+            if (currentCarId) {
+                loadCarDetails(currentCarId);
             }
         }
-        
-        // Send OTP (simulated)
-        function sendOTP() {
-            const userName = document.getElementById('userName').value;
-            const userPhone = document.getElementById('userPhone').value;
-            
-            // Check if fields are filled
-            if (!userName || !userPhone) {
-                alert('Please fill in your name and phone number!');
+
+        // Car Registration (Owner)
+        async function registerCar() {
+            const ownerName = document.getElementById('ownerName').value.trim();
+            const ownerPhone = document.getElementById('ownerPhone').value.trim();
+            const carPlate = document.getElementById('carPlate').value.trim().toUpperCase();
+
+            if (!ownerName || !ownerPhone || !carPlate) {
+                showError('Please fill all fields');
                 return;
             }
-            
-            // Check phone format
-            if (!userPhone.startsWith('+91') || userPhone.length < 13) {
-                alert('Please enter a valid Indian phone number (+91...)');
+
+            if (!ownerPhone.startsWith('+91') || ownerPhone.length < 13) {
+                showError('Please enter a valid Indian phone number (+91...)');
                 return;
             }
-            
-            // Generate random OTP
-            generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
-            
-            // Show phone number
-            document.getElementById('sentToPhone').textContent = userPhone;
-            
-            // In real app, SMS would be sent here
-            alert(`Demo: Your OTP is ${generatedOTP}\n(In real app, this would be sent via SMS)`);
-            console.log('Generated OTP:', generatedOTP);
-            
-            nextStep();
+
+            const plateRegex = /^[A-Z]{2}[0-9]{1,2}[A-Z]{1,2}[0-9]{4}$/;
+            if (!plateRegex.test(carPlate)) {
+                showError('Please enter a valid plate number (e.g., KA01AB1234)');
+                return;
+            }
+
+            const button = document.getElementById('registerBtn');
+            const originalText = button.textContent;
+            showLoading(button, 'Registering...');
+
+            try {
+                const response = await apiCall('/register-car', 'POST', {
+                    ownerName,
+                    ownerPhone,
+                    carPlate
+                });
+
+                currentCarId = response.carId;
+                generatedQRData = response.qrCode;
+
+                document.getElementById('qr-image').src = response.qrCode;
+                document.getElementById('qr-result').style.display = 'block';
+
+                showSuccess(response.message);
+
+            } catch (error) {
+                showError(error.message || 'Failed to register car');
+            } finally {
+                hideLoading(button, originalText);
+            }
         }
-        
-        // Verify OTP
-        function verifyOTP() {
+
+        function downloadQR() {
+            if (generatedQRData) {
+                const link = document.createElement('a');
+                const plate = document.getElementById('carPlate').value || 'QRCode';
+                link.download = `QR-${plate}.png`;
+                link.href = generatedQRData;
+                link.click();
+            }
+        }
+
+        function testScan() {
+            if (currentCarId) {
+                showScannerView();
+                loadCarDetails(currentCarId);
+            }
+        }
+
+        // Scanner Functions
+        async function loadCarDetails(carId) {
+            const carDetails = document.getElementById('car-details');
+            const contactBtn = document.getElementById('contact-btn');
+            const loading = document.getElementById('car-loading');
+
+            loading.style.display = 'block';
+            contactBtn.style.display = 'none';
+
+            try {
+                const response = await apiCall(`/car/${carId}`);
+
+                carDetails.innerHTML = `
+                    <strong>Plate Number:</strong> ${response.car.plateNumber}<br>
+                    <strong>Vehicle Type:</strong> ${response.car.vehicleType}<br>
+                    <strong>Owner:</strong> ${response.car.ownerName}<br>
+                    <strong>Status:</strong> <span style="color: green;">✅ Active</span>
+                `;
+
+                contactBtn.style.display = 'block';
+                showSuccess('Car found! Click "Contact Owner" to proceed.');
+
+            } catch (error) {
+                carDetails.innerHTML = `
+                    <div style="text-align: center; color: red;">
+                        <p>❌ Car not found or inactive</p>
+                        <p style="font-size: 14px;">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Scanner Step Navigation
+        function nextScanStep() {
+            if (currentScanStep < 4) {
+                document.getElementById(`scan-step-${currentScanStep}`).classList.remove('active');
+                currentScanStep++;
+                document.getElementById(`scan-step-${currentScanStep}`).classList.add('active');
+            }
+        }
+
+        function prevScanStep() {
+            if (currentScanStep > 1) {
+                document.getElementById(`scan-step-${currentScanStep}`).classList.remove('active');
+                currentScanStep--;
+                document.getElementById(`scan-step-${currentScanStep}`).classList.add('active');
+            }
+        }
+
+        // Real OTP Functions
+        async function sendRealOTP() {
+            const scannerName = document.getElementById('scannerName').value.trim();
+            const scannerPhone = document.getElementById('scannerPhone').value.trim();
+            const reason = document.getElementById('contactReason').value.trim();
+
+            if (!scannerName || !scannerPhone) {
+                showError('Please fill all required fields');
+                return;
+            }
+
+            if (!scannerPhone.startsWith('+91') || scannerPhone.length < 13) {
+                showError('Please enter a valid Indian phone number');
+                return;
+            }
+
+            const button = document.getElementById('otp-btn');
+            const originalText = button.textContent;
+            showLoading(button, 'Sending...');
+
+            try {
+                const response = await apiCall('/send-otp', 'POST', {
+                    carId: currentCarId,
+                    scannerName,
+                    scannerPhone,
+                    reason
+                });
+
+                currentSessionId = response.sessionId;
+                document.getElementById('otp-phone').textContent = scannerPhone;
+
+                if (response.demoOTP) {
+                    alert(`Demo: Your OTP is ${response.demoOTP}\n(In production, this would be sent via SMS)`);
+                }
+
+                showSuccess(response.message);
+                nextScanStep();
+
+            } catch (error) {
+                showError(error.message || 'Failed to send OTP');
+            } finally {
+                hideLoading(button, originalText);
+            }
+        }
+
+        async function verifyRealOTP() {
             const otpInputs = document.querySelectorAll('.otp-input');
             let enteredOTP = '';
-            
-            otpInputs.forEach(input => {
-                enteredOTP += input.value;
-            });
-            
+            otpInputs.forEach(input => enteredOTP += input.value);
+
             if (enteredOTP.length !== 6) {
-                alert('Please enter complete 6-digit OTP');
+                showError('Please enter complete 6-digit OTP');
                 return;
             }
-            
-            if (enteredOTP === generatedOTP) {
-                alert('✅ Verification Successful!');
-                nextStep();
-            } else {
-                alert('❌ Wrong OTP. Please try again.');
-                // Clear OTP inputs
+
+            const button = document.getElementById('verify-btn');
+            const originalText = button.textContent;
+            showLoading(button, 'Verifying...');
+
+            try {
+                const response = await apiCall('/verify-otp', 'POST', {
+                    carId: currentCarId,
+                    sessionId: currentSessionId,
+                    otp: enteredOTP,
+                    scannerName: document.getElementById('scannerName').value,
+                    scannerPhone: document.getElementById('scannerPhone').value,
+                    reason: document.getElementById('contactReason').value
+                });
+
+                document.getElementById('final-owner-name').textContent = response.owner.name;
+                document.getElementById('final-owner-phone').textContent = response.owner.phone;
+
+                showSuccess('Verification successful!');
+                nextScanStep();
+
+            } catch (error) {
+                showError(error.message || 'Invalid OTP');
                 otpInputs.forEach(input => input.value = '');
                 otpInputs[0].focus();
+            } finally {
+                hideLoading(button, originalText);
             }
         }
-        
-        // Resend OTP
-        function resendOTP() {
-            sendOTP();
+
+        function resendRealOTP() {
+            sendRealOTP();
         }
-        
-        // Auto-move between OTP inputs
+
+        // Scan History Functions
+        async function loadScanHistory() {
+            const phone = document.getElementById('lookupPhone').value.trim();
+
+            if (!phone || !phone.startsWith('+91')) {
+                showError('Please enter your phone number with +91');
+                return;
+            }
+
+            const scanList = document.getElementById('scan-list');
+            scanList.innerHTML = '<div style="text-align: center;"><span class="loading" style="border-color: #4299e1; border-top-color: transparent;"></span> Loading scan history...</div>';
+
+            try {
+                const response = await apiCall(`/scan-logs/${encodeURIComponent(phone)}`);
+                const statsResponse = await apiCall(`/scan-stats/${encodeURIComponent(phone)}`);
+
+                if (statsResponse.success) {
+                    document.getElementById('stats-summary').style.display = 'block';
+                    document.getElementById('total-scans').textContent = statsResponse.stats.totalScans;
+                    document.getElementById('today-scans').textContent = statsResponse.stats.todayScans;
+                    document.getElementById('verified-scans').textContent = statsResponse.stats.verifiedScans;
+                }
+
+                if (response.scans.length === 0) {
+                    scanList.innerHTML = '<p style="text-align: center; color: #666;">No one has scanned your QR codes yet.</p>';
+                } else {
+                    scanList.innerHTML = response.scans.map(scan => `
+                        <div style="background: #f7fafc; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 4px solid ${scan.verified ? '#48bb78' : '#fc8181'};">
+                            <div style="display: flex; justify-content: space-between;">
+                                <div>
+                                    <strong>${scan.scannerName}</strong>
+                                    ${scan.verified ? '<span style="color: #48bb78;">✓ Verified</span>' : '<span style="color: #fc8181;">Unverified</span>'}
+                                </div>
+                                <small>${new Date(scan.timestamp).toLocaleDateString()}</small>
+                            </div>
+                            <div style="margin: 5px 0;">
+                                <span style="color: #666;">Phone:</span> ${scan.scannerPhone}<br>
+                                <span style="color: #666;">Car:</span> ${scan.carPlate}<br>
+                                ${scan.reason ? `<span style="color: #666;">Reason:</span> ${scan.reason}` : ''}
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <button onclick="callScanner('${scan.scannerPhone}')" style="padding: 5px 15px; font-size: 14px; margin-right: 5px; width: auto;">
+                                    📞 Call Back
+                                </button>
+                                <button onclick="blockScanner('${scan.scannerPhone}', '${scan.carId}')" style="padding: 5px 15px; font-size: 14px; background: #fc8181; width: auto;">
+                                    🚫 Block
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                localStorage.setItem('ownerPhone', phone);
+
+            } catch (error) {
+                scanList.innerHTML = `<div class="error-message">${error.message || 'Failed to load scan history'}</div>`;
+            }
+        }
+
+        function callScanner(phone) {
+            window.open(`tel:${phone}`);
+        }
+
+        async function blockScanner(phone, carId) {
+            if (confirm(`Block ${phone} from scanning your cars?`)) {
+                alert('Blocking feature coming soon!');
+            }
+        }
+
+        // Contact Actions
+        function callOwner() {
+            const phone = document.getElementById('final-owner-phone').textContent;
+            window.open(`tel:${phone}`);
+        }
+
+        function messageOwner() {
+            const phone = document.getElementById('final-owner-phone').textContent.replace(/\s/g, '');
+            const name = document.getElementById('scannerName').value;
+            const plate = document.querySelector('#car-details').textContent.match(/Plate Number: (\w+)/)?.[1] || 'your car';
+            const message = `Hi! I found ${plate} and need to contact you. This is ${name}.`;
+
+            window.open(`https://wa.me/${phone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(message)}`);
+        }
+
+        // Utility Functions
         function moveToNext(currentInput, index) {
             if (currentInput.value.length === 1 && index < 5) {
                 const otpInputs = document.querySelectorAll('.otp-input');
                 otpInputs[index + 1].focus();
             }
         }
-        
-        // Call owner
-        function callOwner() {
-            const phone = '+919876543210';
-            window.open(`tel:${phone}`);
-        }
-        
-        // Message owner via WhatsApp
-        function messageOwner() {
-            const phone = '919876543210';
-            const userName = document.getElementById('userName').value;
-            const message = `Hi! I found your car (KA01AB1234) and need to contact you. This is ${userName}.`;
-            
-            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`);
-        }
-        
-        // Start over
+
         function startOver() {
-            // Reset to step 1
-            document.getElementById(`step${currentStep}`).classList.remove('active');
-            currentStep = 1;
-            document.getElementById('step1').classList.add('active');
-            
-            // Clear all inputs
-            document.getElementById('userName').value = '';
-            document.getElementById('userPhone').value = '';
-            document.getElementById('reason').value = '';
-            
-            const otpInputs = document.querySelectorAll('.otp-input');
-            otpInputs.forEach(input => input.value = '');
-            
-            generatedOTP = '';
+            currentScanStep = 1;
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`scan-step-${i}`).classList.remove('active');
+            }
+            document.getElementById('scan-step-1').classList.add('active');
+
+            document.getElementById('scannerName').value = '';
+            document.getElementById('scannerPhone').value = '';
+            document.getElementById('contactReason').value = '';
+            document.querySelectorAll('.otp-input').forEach(input => input.value = '');
         }
-        
-        // Auto-focus on first input when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚗 Car Contact QR App Loaded Successfully!');
-            console.log('Made by: Your Name (Cybersecurity Student)');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('🚗 Car Contact QR App with Real Backend Loaded!');
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const carId = urlParams.get('car');
+            if (carId) {
+                currentCarId = carId;
+                showScannerView();
+                loadCarDetails(carId);
+            }
+
+            const savedPhone = localStorage.getItem('ownerPhone');
+            if (savedPhone) {
+                document.getElementById('lookupPhone').value = savedPhone;
+            }
         });
     </script>
 </body>
+
 </html>
